@@ -2,7 +2,9 @@
 #include <wiringPi.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdlib.h>
 #include <sys/time.h>
+#include <signal.h>
 
 #define STOP 0
 #define GO   1
@@ -12,7 +14,14 @@
 struct timeval tv_s;
 struct timeval tv_f;
 
+void cleanup(int foo) {
+  digitalWrite(GO, LOW);
+  digitalWrite(STOP, LOW);
+  exit(0);
+}
+
 int main (int argc, char** argv) {
+  signal(SIGINT, cleanup);
   // Setup the pins
 	wiringPiSetup();
 	pinMode (STOP, OUTPUT);
