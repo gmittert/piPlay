@@ -1,2 +1,2 @@
 ALL:
-	gcc -o motor -lwiringPi motor.c 
+	gcc -o motor -std=gnu99 -lwiringPi motor.c 

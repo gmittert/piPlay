@@ -2,25 +2,38 @@
 #include <wiringPi.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdlib.h>
 #include <sys/time.h>
+#include <signal.h>
 
+#define EN   0
+#define PH   1
 #define TRIG 3
 #define ECHO 4
 #define SPEED_OF_SOUND 34300
 struct timeval tv_s;
 struct timeval tv_f;
 
+void cleanup(int foo) {
+  digitalWrite(EN, LOW);
+  exit(0);
+}
+
 int main (int argc, char** argv) {
+  signal(SIGINT, cleanup);
   // Setup the pins
 	wiringPiSetup();
+	pinMode (EN, OUTPUT);
+	pinMode (PH, OUTPUT);
 	pinMode (TRIG, OUTPUT);
 	pinMode (ECHO, INPUT);
   digitalWrite (TRIG, LOW);
+  digitalWrite(PH, LOW);
   sleep(1);
-  printf("\n");
 
   while (1) {
-    sleep(1);
+//    sleep(1);
+    usleep(100000);
     // Pulse the sensor for 10us to start the ranging program
     digitalWrite (TRIG, HIGH);
     usleep(10);
@@ -34,7 +47,11 @@ int main (int argc, char** argv) {
     gettimeofday(&tv_f, NULL);
     int duration = tv_f.tv_usec - tv_s.tv_usec;
     int distance = duration * SPEED_OF_SOUND / 2000000;
-    printf("Dist: %5dcm\n", distance);
+    if (distance > 50) {
+      digitalWrite(EN, HIGH);
+    } else {
+      digitalWrite(EN, LOW);
+    }
   }
   return 0;
 }

@@ -1,18 +1,33 @@
 #include <stdio.h>
 #include <wiringPi.h>
 #include <string.h>
-#define EN 0
-#define PH 1
+#include <time.h>
+#define EN 3
+#define PH 4
 
 int main (int argc, char** argv) {
 	wiringPiSetup();
 	pinMode (EN, OUTPUT);
 	pinMode (PH, OUTPUT);
 
-  digitalWrite (EN, HIGH);
-  digitalWrite (PH, LOW);
+  struct timespec secs;
+  secs.tv_sec = 0;
+  secs.tv_nsec = 500000000;
 
-  sleep(2);
-  digitalWrite (EN, LOW);
+  while (1) {
+    char c = getchar();
+    if (c == 'p') { 
+      digitalWrite (EN, LOW);
+    } else if (c == '['){
+      digitalWrite (PH, LOW);
+      digitalWrite (EN, HIGH);
+    } else if (c == ']'){
+      digitalWrite (PH, HIGH);
+      digitalWrite (EN, HIGH);
+    } else if (c == '\''){
+      digitalWrite (EN, LOW);
+      break;
+    }
+  }
   return 0;
 }
